@@ -472,14 +472,28 @@
   }
 
   function render(data, lastUpdatedDate) {
-    const sorted = [...data].sort((a, b) => b.score - a.score);
-    const maxScore = sorted[0].score;
-    const champions = sorted.filter(p => p.score === maxScore);
-
     const podiumEl = document.getElementById('podium');
     const rowsEl = document.getElementById('rows');
     const bannerEl = document.getElementById('championBanner');
     const championNamesEl = document.getElementById('championNames');
+    const legendEl = document.getElementById('legend');
+
+    if (!data || data.length === 0) {
+      bannerEl.classList.remove('show');
+      podiumEl.innerHTML = '';
+      legendEl.className = 'notice notice-pending';
+      legendEl.innerHTML = `<span class="notice-icon">📋</span><span>No participants yet — scores will appear here once entries are added to the sheet.</span>`;
+      rowsEl.innerHTML = '';
+      document.getElementById('subtitle').textContent = 'Top Scorers';
+      document.getElementById('updated').textContent =
+        'Last updated ' + (lastUpdatedDate || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      return;
+    }
+
+    const sorted = [...data].sort((a, b) => b.score - a.score);
+    const maxScore = sorted[0].score;
+    const champions = sorted.filter(p => p.score === maxScore);
+
 
     if (IS_FINAL_WEEK) {
       bannerEl.classList.add('show');
@@ -512,7 +526,6 @@
 
     document.getElementById('subtitle').textContent = `Top ${sorted.length} Highest Scorers`;
 
-    const legendEl = document.getElementById('legend');
     legendEl.className = 'notice ' + (IS_FINAL_WEEK ? 'notice-final' : 'notice-pending');
     legendEl.innerHTML = IS_FINAL_WEEK
       ? `<span class="notice-icon">🎉</span><span>Final results: <strong>the top ${REWARD_CUTOFF} are the winners receiving rewards</strong>, out of ${sorted.length} participants.</span>`
