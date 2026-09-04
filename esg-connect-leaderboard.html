@@ -471,7 +471,7 @@
     return AVATAR_COLORS[index % AVATAR_COLORS.length];
   }
 
-  function render(data) {
+  function render(data, lastUpdatedDate) {
     const sorted = [...data].sort((a, b) => b.score - a.score);
     const maxScore = sorted[0].score;
     const champions = sorted.filter(p => p.score === maxScore);
@@ -546,22 +546,26 @@
     }).join('');
 
     document.getElementById('updated').textContent =
-      'Last updated ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      'Last updated ' + (lastUpdatedDate || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   async function load() {
     if (!SHEET_API_URL) {
-      render(mockData);
+      render(mockData, new Date());
       document.getElementById('status').style.display = 'block';
       document.getElementById('status').textContent = 'Showing sample data — set the SHEET_API_URL variable to your Apps Script URL to load real data.';
       return;
     }
     try {
       const res = await fetch(SHEET_API_URL);
-      const data = await res.json();
-      render(data);
+      const payload = await res.json();
+      // Supports either { lastUpdated, data } from the updated Apps Script,
+      // or a plain array from the older script version.
+      const rows = Array.isArray(payload) ? payload : payload.data;
+      const lastUpdatedDate = Array.isArray(payload) ? new Date() : new Date(payload.lastUpdated);
+      render(rows, lastUpdatedDate);
     } catch (err) {
-      render(mockData);
+      render(mockData, new Date());
       document.getElementById('status').style.display = 'block';
       document.getElementById('status').textContent = "Couldn't fetch data from the sheet — showing sample data instead.";
     }
