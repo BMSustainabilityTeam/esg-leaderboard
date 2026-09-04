@@ -396,7 +396,7 @@
     <div class="mark">🌱</div>
     <div class="band-text">
       <h1>Sustainability Connect</h1>
-      <div class="subtitle">Top 20 Highest Scorers</div>
+      <div class="subtitle" id="subtitle">Top Scorers</div>
     </div>
     <div class="updated" id="updated">Loading data…</div>
   </div>
@@ -509,6 +509,8 @@
         <div class="p-score-label">points</div>
       </div>`;
     }).join('');
+
+    document.getElementById('subtitle').textContent = `Top ${sorted.length} Highest Scorers`;
 
     const legendEl = document.getElementById('legend');
     legendEl.className = 'notice ' + (IS_FINAL_WEEK ? 'notice-final' : 'notice-pending');
