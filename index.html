@@ -158,7 +158,7 @@
     border-radius: 14px;
     box-shadow: var(--shadow);
     padding: 18px 22px;
-    margin-bottom: 22px;
+    margin-bottom: 12px;
     font-size: 17px;
     line-height: 1.6;
     display: flex;
@@ -178,6 +178,18 @@
     color: #145C3B;
   }
   .notice-final strong { color: #0B4F3F; font-weight: 700; }
+
+  .encourage-note {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 22px;
+    padding: 0 4px;
+  }
+  .encourage-note.show { display: flex; }
+  .encourage-note .en-emoji { font-size: 16px; }
 
   .podium {
     display: grid;
@@ -413,6 +425,11 @@
 
   <div class="notice" id="legend"></div>
 
+  <div class="encourage-note" id="encourageNote">
+    <span class="en-emoji">🚀</span>
+    <span>Don't give up yet! There's still time to earn more points and climb the leaderboard! 🚀✨ Keep going! 🏆</span>
+  </div>
+
   <div class="podium" id="podium"></div>
 
   <div class="list">
@@ -477,9 +494,11 @@
     const bannerEl = document.getElementById('championBanner');
     const championNamesEl = document.getElementById('championNames');
     const legendEl = document.getElementById('legend');
+    const encourageEl = document.getElementById('encourageNote');
 
     if (!data || data.length === 0) {
       bannerEl.classList.remove('show');
+      encourageEl.classList.remove('show');
       podiumEl.innerHTML = '';
       legendEl.className = 'notice notice-pending';
       legendEl.innerHTML = `<span class="notice-icon">📋</span><span>No participants yet — scores will appear here once entries are added to the sheet.</span>`;
@@ -497,9 +516,11 @@
 
     if (IS_FINAL_WEEK) {
       bannerEl.classList.add('show');
+      encourageEl.classList.remove('show');
       championNamesEl.textContent = champions.map(c => c.name).join('  •  ');
     } else {
       bannerEl.classList.remove('show');
+      encourageEl.classList.add('show');
     }
 
     const top3 = sorted.slice(0, 3);
