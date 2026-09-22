@@ -529,19 +529,27 @@
     legendEl.className = 'notice ' + (IS_FINAL_WEEK ? 'notice-final' : 'notice-pending');
     legendEl.innerHTML = IS_FINAL_WEEK
       ? `<span class="notice-icon">🎉</span><span>Final results: <strong>the top ${REWARD_CUTOFF} are the winners receiving rewards</strong>, out of ${sorted.length} participants.</span>`
-      : `<span class="notice-icon">⏳</span><span>Ranks 1–${REWARD_CUTOFF} are currently provisional leaders — <strong>rewards and the ESG Champion title will be decided only by final-week cumulative scores.</strong></span>`;
+      : `<span class="notice-icon">⏳</span><span>The top ${REWARD_CUTOFF} scores (including ties) are currently provisional leaders — <strong>rewards and the ESG Champion title will be decided only by final-week cumulative scores.</strong></span>`;
 
     const tagLabel = IS_FINAL_WEEK ? 'Winner' : 'Currently Leading';
+
+    // Ties matter: use the score at the cutoff position, not the array index,
+    // so everyone tied with the 10th-place score is included, not just the
+    // first 10 entries in list order.
+    const cutoffScore = sorted.length >= REWARD_CUTOFF
+      ? sorted[REWARD_CUTOFF - 1].score
+      : sorted[sorted.length - 1].score;
 
     rowsEl.innerHTML = sorted.map((p, i) => {
       const rank = i + 1;
       const isChamp = IS_FINAL_WEEK && p.score === maxScore;
+      const inRewardZone = p.score >= cutoffScore;
       const barPct = Math.max(6, Math.round((p.score / maxScore) * 100));
 
       let tag = '';
       if (isChamp) {
         tag = `<span class="tag tag-champion">👑 ESG Champion</span>`;
-      } else if (rank <= REWARD_CUTOFF) {
+      } else if (inRewardZone) {
         tag = `<span class="tag tag-provisional">${tagLabel}</span>`;
       }
 
