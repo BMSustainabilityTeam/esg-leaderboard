@@ -191,6 +191,43 @@
   .encourage-note.show { display: flex; }
   .encourage-note .en-emoji { font-size: 16px; }
 
+  .bonus-box {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+    padding: 12px 20px;
+    margin-bottom: 22px;
+  }
+  .bonus-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .bonus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 18px;
+  }
+  .bonus-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .bonus-pts {
+    flex-shrink: 0;
+    font-weight: 700;
+    color: var(--accent);
+    background: #E4F2ED;
+    border-radius: 20px;
+    padding: 1px 9px;
+    font-size: 12px;
+  }
+
   .podium {
     display: grid;
     grid-template-columns: 1fr 1.15fr 1fr;
@@ -398,6 +435,7 @@
     .podium { grid-template-columns: 1fr 1fr 1fr; }
     .row-dept { display: none; }
     .updated { display: none; }
+    .bonus-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -408,7 +446,7 @@
     <div class="mark">🌱</div>
     <div class="band-text">
       <h1>Sustainability Connect</h1>
-      <div class="subtitle" id="subtitle">Top Scorers</div>
+      <div class="subtitle" id="subtitle">Leaderboard</div>
     </div>
     <div class="updated" id="updated">Loading data…</div>
   </div>
@@ -425,9 +463,17 @@
 
   <div class="notice" id="legend"></div>
 
+  <div class="bonus-box">
+    <div class="bonus-title">🌟 Weekly Bonus Points</div>
+    <div class="bonus-grid">
+      <div class="bonus-item"><span class="bonus-pts">+50 pts</span><span>Top 10 quiz accuracy each week</span></div>
+      <div class="bonus-item"><span class="bonus-pts">+50 pts</span><span>Share a photo, idea or experience (when applicable)</span></div>
+    </div>
+  </div>
+
   <div class="encourage-note" id="encourageNote">
     <span class="en-emoji">🚀</span>
-    <span>Don't give up yet! There's still time to earn more points and climb the leaderboard! 🚀✨ Keep going! 🏆</span>
+    <span>Don't give up yet! There's still time to earn more points and climb the leaderboard!</span>
   </div>
 
   <div class="podium" id="podium"></div>
@@ -503,7 +549,7 @@
       legendEl.className = 'notice notice-pending';
       legendEl.innerHTML = `<span class="notice-icon">📋</span><span>No participants yet — scores will appear here once entries are added to the sheet.</span>`;
       rowsEl.innerHTML = '';
-      document.getElementById('subtitle').textContent = 'Top Scorers';
+      document.getElementById('subtitle').textContent = 'Leaderboard';
       document.getElementById('updated').textContent =
         'Last updated ' + (lastUpdatedDate || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       return;
@@ -545,7 +591,7 @@
       </div>`;
     }).join('');
 
-    document.getElementById('subtitle').textContent = `Top ${sorted.length} Highest Scorers`;
+    document.getElementById('subtitle').textContent = `Top ${sorted.length} Leaderboard`;
 
     legendEl.className = 'notice ' + (IS_FINAL_WEEK ? 'notice-final' : 'notice-pending');
     legendEl.innerHTML = IS_FINAL_WEEK
