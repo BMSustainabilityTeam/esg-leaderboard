@@ -431,7 +431,74 @@
     padding: 24px 0 0;
   }
 
+  .winners-section { margin-top: 28px; }
+  .winners-heading {
+    font-weight: 700;
+    font-size: 20px;
+    margin: 0 0 12px;
+  }
+  .winners-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+  .winner-card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+  }
+  .winner-card-title {
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .winner-card-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 6px 0 12px;
+  }
+  .winner-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+  }
+  .winner-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .winner-body { flex: 1; min-width: 0; }
+  .winner-name { font-weight: 600; font-size: 15px; }
+  .winner-dept { color: var(--muted); font-size: 13px; }
+  .winner-week {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--bg);
+    border-radius: 20px;
+    padding: 1px 9px;
+    flex-shrink: 0;
+  }
+  .winner-empty {
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
   @media (max-width: 560px) {
+    .winners-grid { grid-template-columns: 1fr; }
     .podium { grid-template-columns: 1fr 1fr 1fr; }
     .row-dept { display: none; }
     .updated { display: none; }
@@ -466,7 +533,7 @@
   <div class="bonus-box">
     <div class="bonus-title">🌟 Weekly Bonus Points</div>
     <div class="bonus-grid">
-      <div class="bonus-item"><span class="bonus-pts">+50 pts</span><span>Top 10 quiz accuracy each week</span></div>
+      <div class="bonus-item"><span class="bonus-pts">+50 pts</span><span>Answer the weekly quiz correctly</span></div>
       <div class="bonus-item"><span class="bonus-pts">+50 pts</span><span>Share a photo, idea or experience (when applicable)</span></div>
     </div>
   </div>
@@ -485,6 +552,22 @@
       <div class="col-score">Total Score</div>
     </div>
     <div id="rows"></div>
+  </div>
+
+  <div class="winners-section">
+    <h2 class="winners-heading">🍀 Lucky Bonus Recipients</h2>
+    <div class="winners-grid">
+      <div class="winner-card">
+        <div class="winner-card-title">⭐ Employee Spotlight</div>
+        <div class="winner-card-desc">Share your best photos or ideas in Weeks 4 and 6. Two outstanding participants will receive 100 bonus points each!</div>
+        <div id="winnersSpotlight"></div>
+      </div>
+      <div class="winner-card">
+        <div class="winner-card-title">🍀 Newcomer Lucky Draw</div>
+        <div class="winner-card-desc">New here? Welcome aboard! Join us for the first time in Week 6 and you could be one of our lucky newcomers winning 100 bonus points each. 🎉</div>
+        <div id="winnersNewcomer"></div>
+      </div>
+    </div>
   </div>
 
   <div class="status" id="status" style="display:none;"></div>
@@ -639,8 +722,51 @@
       'Last updated ' + (lastUpdatedDate || new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
+  const mockWinners = [
+    { name: "Natalie Cruz", department: "Head Office", category: "spotlight", week: 4, point: 100 },
+    { name: "Marcus Lee", department: "Factory B", category: "spotlight", week: 4, point: 100 },
+    { name: "Leo Santos", department: "Logistics", category: "newcomer", week: 6, point: 100 },
+    { name: "Maya Thompson", department: "Factory A", category: "newcomer", week: 6, point: 100 }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
+
+  function renderWinnerList(el, list) {
+    if (!list.length) {
+      el.innerHTML = '<div class="winner-empty">Lucky names will be announced soon.</div>';
+      return;
+    }
+    el.innerHTML = list.map((w, i) => {
+      const name = String(w.name || '').trim();
+      const initialChar = name.charAt(0) || '?';
+      const weekPill = w.week ? `<span class="winner-week">Week ${esc(w.week)}</span>` : '';
+      return `
+      <div class="winner-row">
+        <div class="winner-avatar" style="background:${avatarColor(i)}">${esc(initialChar)}</div>
+        <div class="winner-body">
+          <div class="winner-name">${esc(name)}</div>
+          <div class="winner-dept">${esc(w.department || '')}</div>
+        </div>
+        ${weekPill}
+        <span class="bonus-pts">${w.point ? '+' + esc(w.point) + ' pts' : ''}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderWinners(winners) {
+    const clean = (winners || []).filter(w => w && String(w.name || '').trim() !== '');
+    const byCat = cat => clean.filter(w => String(w.category || '').trim().toLowerCase() === cat);
+    renderWinnerList(document.getElementById('winnersSpotlight'), byCat('spotlight'));
+    renderWinnerList(document.getElementById('winnersNewcomer'), byCat('newcomer'));
+  }
+
   async function load() {
     if (!SHEET_API_URL) {
+      renderWinners(mockWinners);
       render(mockData, new Date());
       document.getElementById('status').style.display = 'block';
       document.getElementById('status').textContent = 'Showing sample data — set the SHEET_API_URL variable to your Apps Script URL to load real data.';
@@ -654,7 +780,9 @@
       const rows = Array.isArray(payload) ? payload : payload.data;
       const lastUpdatedDate = Array.isArray(payload) ? new Date() : new Date(payload.lastUpdated);
       render(rows, lastUpdatedDate);
+      renderWinners(Array.isArray(payload) ? [] : payload.winners);
     } catch (err) {
+      renderWinners(mockWinners);
       render(mockData, new Date());
       document.getElementById('status').style.display = 'block';
       document.getElementById('status').textContent = "Couldn't fetch data from the sheet — showing sample data instead.";
