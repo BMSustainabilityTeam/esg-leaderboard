@@ -443,6 +443,7 @@
     gap: 14px;
     align-items: start;
   }
+  .winner-card.wide { grid-column: 1 / -1; }
   .winner-card {
     background: var(--card);
     border-radius: 16px;
@@ -566,6 +567,11 @@
         <div class="winner-card-title">🍀 Newcomer Lucky Draw</div>
         <div class="winner-card-desc">New here? Welcome aboard! Join us for the first time in Week 6 and you could be one of our lucky newcomers winning 100 bonus points each. 🎉</div>
         <div id="winnersNewcomer"></div>
+      </div>
+      <div class="winner-card wide">
+        <div class="winner-card-title">🎲 Weekly Lucky Draw</div>
+        <div class="winner-card-desc">Every week, a few lucky participants are drawn at random to receive bonus points. Keep taking part for your chance to be next! ✨</div>
+        <div id="winnersWeekly"></div>
       </div>
     </div>
   </div>
@@ -726,7 +732,10 @@
     { name: "Natalie Cruz", department: "Head Office", category: "spotlight", week: 4, point: 100 },
     { name: "Marcus Lee", department: "Factory B", category: "spotlight", week: 4, point: 100 },
     { name: "Leo Santos", department: "Logistics", category: "newcomer", week: 6, point: 100 },
-    { name: "Maya Thompson", department: "Factory A", category: "newcomer", week: 6, point: 100 }
+    { name: "Maya Thompson", department: "Factory A", category: "newcomer", week: 6, point: 100 },
+    { name: "Ryan Patel", department: "Factory A", category: "weekly", week: 2, point: 50 },
+    { name: "Grace Lim", department: "Head Office", category: "weekly", week: 3, point: 50 },
+    { name: "Owen Davies", department: "Logistics", category: "weekly", week: 3, point: 50 }
   ];
 
   function esc(s) {
@@ -762,6 +771,9 @@
     const byCat = cat => clean.filter(w => String(w.category || '').trim().toLowerCase() === cat);
     renderWinnerList(document.getElementById('winnersSpotlight'), byCat('spotlight'));
     renderWinnerList(document.getElementById('winnersNewcomer'), byCat('newcomer'));
+    // Weekly draws accumulate over the campaign, so show the latest week first.
+    const weekly = byCat('weekly').sort((a, b) => (Number(b.week) || 0) - (Number(a.week) || 0));
+    renderWinnerList(document.getElementById('winnersWeekly'), weekly);
   }
 
   async function load() {
