@@ -768,7 +768,8 @@
 
   function renderWinners(winners) {
     const clean = (winners || []).filter(w => w && String(w.name || '').trim() !== '');
-    const byCat = cat => clean.filter(w => String(w.category || '').trim().toLowerCase() === cat);
+    // Forgiving match: "Weekly", "weekly draw", "Weekly Lucky Draw" all land in the weekly card.
+    const byCat = cat => clean.filter(w => String(w.category || '').toLowerCase().includes(cat));
     renderWinnerList(document.getElementById('winnersSpotlight'), byCat('spotlight'));
     renderWinnerList(document.getElementById('winnersNewcomer'), byCat('newcomer'));
     // Weekly draws accumulate over the campaign, so show the latest week first.
